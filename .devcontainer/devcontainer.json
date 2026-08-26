@@ -1,0 +1,1 @@
+{ "name": "opencode-devcontainer", "image": "oven/bun:1.3", "postCreateCommand": "bun install" }
