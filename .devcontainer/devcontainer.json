@@ -1,0 +1,13 @@
+{
+  "name": "opencode",
+  "image": "oven/bun:1.3-debian",
+  "postCreateCommand": "apt-get update && apt-get install -y python3 make g++ && bun install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}
