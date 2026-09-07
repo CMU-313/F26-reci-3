@@ -35,15 +35,14 @@ export function TooltipV2(props: TooltipV2Props) {
 
   const inside = () => {
     const active = document.activeElement
-    if (!ref || !active) return false
-    return ref.contains(active)
+    return !!ref && !!active && ref.contains(active)
+
   }
 
   const drop = (expand = state.expand) => {
-    if (expand) return
-    if (ref?.matches(":hover")) return
-    if (inside()) return
-    setState("block", false)
+    if (!expand && !ref?.matches(":hover") && !inside()) {
+      setState("block", false)
+    }
   }
 
   const sync = () => {
