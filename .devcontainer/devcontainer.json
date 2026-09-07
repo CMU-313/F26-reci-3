@@ -4,5 +4,8 @@
     "features": {
         "ghcr.io/devcontainers/features/git:1": {}
     },
-    "postCreateCommand": "apt-get update && apt-get install -y python3 make g++ lcov"
+    "remoteEnv": {
+        "PATH": "/root/.qlty/bin:${containerEnv:PATH}"
+    },
+    "postCreateCommand": "apt-get update && apt-get install -y python3 make g++ lcov curl xz-utils && curl https://qlty.sh | bash"
 }
