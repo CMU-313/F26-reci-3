@@ -1,5 +1,15 @@
-import { describe, expect, test } from "bun:test"
-import { isFocusInside, openChangePlan, shouldArmFromKey, shouldDropBlock } from "./tooltip-v2"
+import { describe, expect, mock, test } from "bun:test"
+
+mock.module("@kobalte/core/tooltip", () => {
+  const Tooltip = () => null
+  Tooltip.Trigger = () => null
+  Tooltip.Portal = () => null
+  Tooltip.Content = () => null
+  return { Tooltip }
+})
+mock.module("./tooltip-v2.css", () => ({}))
+
+const { isFocusInside, openChangePlan, shouldArmFromKey, shouldDropBlock } = await import("./tooltip-v2")
 
 describe("isFocusInside", () => {
   const child = {} as Node
