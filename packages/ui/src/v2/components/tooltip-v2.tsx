@@ -2,6 +2,7 @@ import { Tooltip as KobalteTooltip } from "@kobalte/core/tooltip"
 import { createEffect, Match, onCleanup, splitProps, Switch, type JSX } from "solid-js"
 import type { ComponentProps } from "solid-js"
 import { createStore } from "solid-js/store"
+import { isFocusInside, openChangePlan, shouldArmFromKey, shouldDropBlock } from "./tooltip-v2-behavior"
 import "./tooltip-v2.css"
 
 export interface TooltipV2Props extends ComponentProps<typeof KobalteTooltip> {
@@ -139,24 +140,4 @@ export function TooltipV2(props: TooltipV2Props) {
       </Match>
     </Switch>
   )
-}
-
-export function isFocusInside(container: { contains(node: Node): boolean } | undefined, active: Node | null) {
-  return !!container && !!active && container.contains(active)
-}
-
-export function shouldDropBlock(expand: boolean, hovered: boolean, focusInside: boolean) {
-  return !expand && !hovered && !focusInside
-}
-
-export function shouldArmFromKey(key: string) {
-  return key === "Enter" || key === " "
-}
-
-export function openChangePlan(input: { forceOpen: boolean; block: boolean; open: boolean; skipClick: boolean }) {
-  const blocked = input.forceOpen || (input.block && input.open)
-  return {
-    resetSkipClick: !blocked && input.skipClick,
-    applyOpen: !blocked && !input.skipClick,
-  }
 }

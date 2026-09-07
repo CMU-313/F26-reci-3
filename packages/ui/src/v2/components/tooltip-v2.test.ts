@@ -1,15 +1,108 @@
 import { describe, expect, mock, test } from "bun:test"
+import { createRoot } from "solid-js"
+import { isFocusInside, openChangePlan, shouldArmFromKey, shouldDropBlock } from "./tooltip-v2-behavior"
+
+type RootProps = {
+  children?: unknown
+  onOpenChange?: (open: boolean) => void
+}
+
+type TriggerProps = {
+  children?: unknown
+  ref?: (el: HTMLDivElement) => void
+  onPointerDownCapture?: () => void
+  onKeyDownCapture?: (event: KeyboardEvent) => void
+  onPointerLeave?: () => void
+  onFocusOut?: () => void
+}
+
+type ContentProps = {
+  children?: unknown
+  onPointerDownOutside?: (event: { target: EventTarget | null; preventDefault: () => void }) => void
+}
+
+const captured: { root?: RootProps; trigger?: TriggerProps; content?: ContentProps } = {}
+const env = {
+  hovered: false,
+  expanded: false,
+  contained: undefined as Node | undefined,
+}
+const focus = { node: null as Element | null }
+let observerCallback: (() => void) | undefined
+
+const triggerEl = {
+  matches: () => env.hovered,
+  querySelector: () => (env.expanded ? ({} as Element) : null),
+  contains: (node: Node) => env.contained === node,
+  closest: () => null,
+} as unknown as HTMLDivElement
+
+if (typeof globalThis.Node === "undefined") {
+  globalThis.Node = class Node {} as typeof Node
+}
+
+const host = globalThis as typeof globalThis & { document?: { activeElement: Element | null } }
+if (!host.document) host.document = { activeElement: null }
+Object.defineProperty(host.document, "activeElement", {
+  configurable: true,
+  get: () => focus.node,
+})
+
+globalThis.MutationObserver = class {
+  constructor(callback: () => void) {
+    observerCallback = callback
+  }
+  observe() {}
+  disconnect() {}
+  takeRecords() {
+    return []
+  }
+} as typeof MutationObserver
+
+globalThis.requestAnimationFrame = (callback) => {
+  callback(0)
+  return 1
+}
 
 mock.module("@kobalte/core/tooltip", () => {
-  const Tooltip = () => null
-  Tooltip.Trigger = () => null
-  Tooltip.Portal = () => null
-  Tooltip.Content = () => null
+  const Tooltip = Object.assign(
+    (props: RootProps) => {
+      captured.root = props
+      return props.children
+    },
+    {
+      Trigger: (props: TriggerProps) => {
+        captured.trigger = props
+        props.ref?.(triggerEl)
+        return props.children
+      },
+      Portal: (props: { children?: unknown }) => props.children,
+      Content: (props: ContentProps) => {
+        captured.content = props
+        return props.children
+      },
+    },
+  )
   return { Tooltip }
 })
 mock.module("./tooltip-v2.css", () => ({}))
 
-const { isFocusInside, openChangePlan, shouldArmFromKey, shouldDropBlock } = await import("./tooltip-v2")
+const { TooltipV2 } = await import("./tooltip-v2")
+
+function mount(props: Parameters<typeof TooltipV2>[0]) {
+  captured.root = undefined
+  captured.trigger = undefined
+  captured.content = undefined
+  observerCallback = undefined
+  env.hovered = false
+  env.expanded = false
+  env.contained = undefined
+  focus.node = null
+  return createRoot((dispose) => {
+    TooltipV2(props)
+    return dispose
+  })
+}
 
 describe("isFocusInside", () => {
   const child = {} as Node
@@ -95,5 +188,55 @@ describe("openChangePlan", () => {
       resetSkipClick: true,
       applyOpen: false,
     })
+  })
+})
+
+describe("TooltipV2", () => {
+  test("wires openChangePlan into Kobalte open changes", () => {
+    const dispose = mount({ value: "tip", children: "child" })
+    expect(captured.root?.onOpenChange).toBeDefined()
+
+    captured.root?.onOpenChange?.(true)
+    captured.trigger?.onPointerDownCapture?.()
+    captured.root?.onOpenChange?.(true)
+    captured.root?.onOpenChange?.(false)
+
+    const force = mount({ forceOpen: true, value: "tip", children: "child" })
+    captured.root?.onOpenChange?.(false)
+    force()
+    dispose()
+  })
+
+  test("wires shouldArmFromKey into trigger keydown", () => {
+    const dispose = mount({ value: "tip", children: "child" })
+    captured.trigger?.onKeyDownCapture?.({ key: "Tab" } as KeyboardEvent)
+    captured.trigger?.onKeyDownCapture?.({ key: "Enter" } as KeyboardEvent)
+    captured.trigger?.onKeyDownCapture?.({ key: " " } as KeyboardEvent)
+    dispose()
+  })
+
+  test("wires isFocusInside and shouldDropBlock into leave, focus, and expand", () => {
+    const dispose = mount({ value: "tip", children: "child" })
+
+    env.hovered = true
+    captured.trigger?.onPointerLeave?.()
+    env.hovered = false
+    focus.node = triggerEl
+    captured.trigger?.onPointerLeave?.()
+    focus.node = null
+    captured.trigger?.onPointerLeave?.()
+    captured.trigger?.onFocusOut?.()
+
+    env.expanded = true
+    observerCallback?.()
+    env.expanded = false
+    observerCallback?.()
+
+    captured.content?.onPointerDownOutside?.({
+      target: triggerEl,
+      preventDefault: () => {},
+    })
+    captured.root?.onOpenChange?.(true)
+    dispose()
   })
 })
