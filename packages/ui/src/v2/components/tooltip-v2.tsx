@@ -36,7 +36,6 @@ export function TooltipV2(props: TooltipV2Props) {
   const inside = () => {
     const active = document.activeElement
     return !!ref && !!active && ref.contains(active)
-
   }
 
   const drop = (expand = state.expand) => {
@@ -51,7 +50,6 @@ export function TooltipV2(props: TooltipV2Props) {
     if (expand) {
       setState("block", true)
       close()
-      return
     }
     drop(expand)
   }
@@ -67,16 +65,17 @@ export function TooltipV2(props: TooltipV2Props) {
   }
 
   createEffect(() => {
-    if (!ref) return
-    sync()
-    const obs = new MutationObserver(sync)
-    obs.observe(ref, {
-      subtree: true,
-      childList: true,
-      attributes: true,
-      attributeFilter: ["aria-expanded", "data-expanded"],
-    })
-    onCleanup(() => obs.disconnect())
+    if (ref) {
+      sync()
+      const obs = new MutationObserver(sync)
+      obs.observe(ref, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ["aria-expanded", "data-expanded"],
+      })
+      onCleanup(() => obs.disconnect())
+    }
   })
 
   let justClickedTrigger = false
@@ -94,13 +93,10 @@ export function TooltipV2(props: TooltipV2Props) {
           ignoreSafeArea={local.ignoreSafeArea ?? true}
           open={local.forceOpen || state.open}
           onOpenChange={(open) => {
-            if (local.forceOpen) return
-            if (state.block && open) return
-            if (justClickedTrigger) {
-              justClickedTrigger = false
-              return
-            }
-            setState("open", open)
+            const skipClick = justClickedTrigger
+            const blocked = local.forceOpen || (state.block && open)
+            if (!blocked && skipClick) justClickedTrigger = false
+            if (!blocked && !skipClick) setState("open", open)
           }}
         >
           <KobalteTooltip.Trigger
@@ -110,8 +106,7 @@ export function TooltipV2(props: TooltipV2Props) {
             class={local.class}
             onPointerDownCapture={arm}
             onKeyDownCapture={(event: KeyboardEvent) => {
-              if (event.key !== "Enter" && event.key !== " ") return
-              arm()
+              if (event.key === "Enter" || event.key === " ") arm()
             }}
             onPointerLeave={leave}
             onFocusOut={() => requestAnimationFrame(() => drop())}
