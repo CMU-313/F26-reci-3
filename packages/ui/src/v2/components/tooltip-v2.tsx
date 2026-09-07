@@ -33,13 +33,10 @@ export function TooltipV2(props: TooltipV2Props) {
 
   const close = () => setState("open", false)
 
-  const inside = () => {
-    const active = document.activeElement
-    return !!ref && !!active && ref.contains(active)
-  }
+  const inside = () => isFocusInside(ref, document.activeElement)
 
   const drop = (expand = state.expand) => {
-    if (!expand && !ref?.matches(":hover") && !inside()) {
+    if (shouldDropBlock(expand, !!ref?.matches(":hover"), inside())) {
       setState("block", false)
     }
   }
@@ -80,7 +77,7 @@ export function TooltipV2(props: TooltipV2Props) {
 
   let justClickedTrigger = false
 
-   return (
+  return (
     <Switch>
       <Match when={local.inactive}>{local.children}</Match>
       <Match when={true}>
@@ -92,12 +89,15 @@ export function TooltipV2(props: TooltipV2Props) {
           closeDelay={0}
           ignoreSafeArea={local.ignoreSafeArea ?? true}
           open={local.forceOpen || state.open}
-          // removed gaurded return clauses 
           onOpenChange={(open) => {
-            const skipClick = justClickedTrigger
-            const blocked = local.forceOpen || (state.block && open)
-            if (!blocked && skipClick) justClickedTrigger = false
-            if (!blocked && !skipClick) setState("open", open)
+            const plan = openChangePlan({
+              forceOpen: !!local.forceOpen,
+              block: state.block,
+              open,
+              skipClick: justClickedTrigger,
+            })
+            if (plan.resetSkipClick) justClickedTrigger = false
+            if (plan.applyOpen) setState("open", open)
           }}
         >
           <KobalteTooltip.Trigger
@@ -107,7 +107,7 @@ export function TooltipV2(props: TooltipV2Props) {
             class={local.class}
             onPointerDownCapture={arm}
             onKeyDownCapture={(event: KeyboardEvent) => {
-              if (event.key === "Enter" || event.key === " ") arm()
+              if (shouldArmFromKey(event.key)) arm()
             }}
             onPointerLeave={leave}
             onFocusOut={() => requestAnimationFrame(() => drop())}
@@ -139,4 +139,24 @@ export function TooltipV2(props: TooltipV2Props) {
       </Match>
     </Switch>
   )
+}
+
+export function isFocusInside(container: { contains(node: Node): boolean } | undefined, active: Node | null) {
+  return !!container && !!active && container.contains(active)
+}
+
+export function shouldDropBlock(expand: boolean, hovered: boolean, focusInside: boolean) {
+  return !expand && !hovered && !focusInside
+}
+
+export function shouldArmFromKey(key: string) {
+  return key === "Enter" || key === " "
+}
+
+export function openChangePlan(input: { forceOpen: boolean; block: boolean; open: boolean; skipClick: boolean }) {
+  const blocked = input.forceOpen || (input.block && input.open)
+  return {
+    resetSkipClick: !blocked && input.skipClick,
+    applyOpen: !blocked && !input.skipClick,
+  }
 }
