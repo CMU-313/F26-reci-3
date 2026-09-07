@@ -80,7 +80,7 @@ export function TooltipV2(props: TooltipV2Props) {
 
   let justClickedTrigger = false
 
-  return (
+   return (
     <Switch>
       <Match when={local.inactive}>{local.children}</Match>
       <Match when={true}>
@@ -92,6 +92,7 @@ export function TooltipV2(props: TooltipV2Props) {
           closeDelay={0}
           ignoreSafeArea={local.ignoreSafeArea ?? true}
           open={local.forceOpen || state.open}
+          // removed gaurded return clauses 
           onOpenChange={(open) => {
             const skipClick = justClickedTrigger
             const blocked = local.forceOpen || (state.block && open)
