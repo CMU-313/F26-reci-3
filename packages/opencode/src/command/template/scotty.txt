@@ -1,0 +1,5 @@
+---
+description: Display custom ASCII art of Scotty.
+---
+
+Output an ASCII image of a Scottish Terrier named Scotty. Make him as cute as you can.
