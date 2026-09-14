@@ -569,7 +569,7 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
       },
       {
         name: "scotty",
-        title: "Scotty",
+        title: "generate ASCII art of a scottish terrier",
         category: "Fun",
         suggested: true,
         slashName: "scotty",
