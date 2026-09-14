@@ -1,14 +1,34 @@
+//devcontainer.json
 {
-  "name": "OpenCode Bun Dev",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "oven.bun-vscode"
-      ]
+  "name": "opencode.js",
+
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers-extra/features/bun:1": {
+      "version": "1.3.3"
     }
   },
+
+  "customizations": {
+    "vscode": {
+      "settings": {},
+      "extensions": ["streetsidesoftware.code-spell-checker"]
+    }
+  },
+
+  // "forwardPorts": [3000],
+
+  "portsAttributes": {
+    "3000": {
+      "label": "Hello Remote World",
+      "onAutoForward": "notify"
+    }
+  },
+
   "postCreateCommand": "bun install"
+
+  // "remoteUser": "root"
 }
