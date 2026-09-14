@@ -89,6 +89,40 @@ import { cliErrorMessage, errorFormat } from "./util/error"
 
 registerOpencodeSpinner()
 
+const scottyOutput = `                                                         .....
+                                                   ..::..-----:.
+                                                   .--=----%%=-:.
+                                                   .:-@@%==@@@=--------:::..:--.....
+                                                    :-#@@@@@@@%-=+=*++**=----+=----:.
+                                                    :-#@@@@@@@@%@@@@@%=-=*%@@@@@@@=-:.
+                             .....                 .:-+@@@@@@@@@@@@@@@@@@@@@@@@@@@@+-:.
+                            .----:                 .--*@@@@@@@@@@@@@@@@@@@@@@@@@@@@=-:.
+                         .:--%*-:.                .:-=#@@@@@@@@@@@@@@@@@@@@@@@@@@@@*-:.
+                         .:-=@%--.                  .:-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@*-:.
+                        .:-+@@*-:.                  .:-+@@@@@@@@@@@@@@@@@@@@@@@@@@@@+-:.
+                      .:--=%@%=-.                   :--+@@@@@@@@@@@@@@@@@@@@@@@@@@@+=-.
+                      .:---#@@%--.                  .--##@@@@@@@@@@@@@@@@@@@@@@@@@@@+-:.
+                       :--%@@@#--.                  .-=###%@@@@@@@@@@@@@@@#*@@@@@@@@@=-:.
+                       .--%@@@#--:.........       ..:-=####%@@@@@@@@@@@@@----*@#=@@#-:.
+                    .::--#@@@@*+==-------:::::::::-:-*######%@@@@@@@@@@*---------#--..
+                 ..:---%@@@@@@@@@@@@@@@@@%#*****#%@@@@@#######%@@@@@@@@+--:.  .:---:.
+                .::-+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%########%@@@@@#--:.   ....
+              ..--#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@###########@@%*=-:.
+             .:-=%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%#############--:
+            .--%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%########--.
+           .--+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@####*=-:.
+          .--*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##+-:.
+          .--+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%=--.
+          .--*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*=--:.
+           --#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=--:.
+           :-*@@@@@@@@@@@@**%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*-:.
+           :-+@@@@@@@@@@@#-------+%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*--:.
+           .--@@@@@@@@@@+---:...::-------=+*%%@@@@@@@@%#*@@@@@@@@@*---:.
+           .:-=@@@@@@@@@*--:.     ....:------=------::#@@@@@@@@@@+--.
+            .:-=@@@@@@@@@@--.               ....::......:-*@@@@@@@@@@+-:.
+             .:---===+==---:.                          ..:-----===----:.
+               ..::::::::..                                ...:::::...`
+
 const appGlobalBindingCommands = [
   "session.list",
   "session.new",
@@ -775,6 +809,55 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
         slashName: "debug",
         run: () => {
           dialog.replace(() => <DialogDebug />)
+        },
+        category: "System",
+      },
+      {
+        name: "opencode.scotty",
+        title: "Show Scotty",
+        slashName: "scotty",
+        run: async () => {
+          const agent = local.agent.current()
+          const model = local.model.current()
+          if (!agent || !model) {
+            toast.show({ message: "Connect a provider before running /scotty", variant: "warning" })
+            return
+          }
+
+          try {
+            const sessionID =
+              route.data.type === "session"
+                ? route.data.sessionID
+                : await sdk.client.session
+                    .create({
+                      directory: project.instance.directory(),
+                      workspace: project.workspace.current(),
+                      agent: agent.name,
+                      model: {
+                        providerID: model.providerID,
+                        id: model.modelID,
+                        variant: local.model.variant.current(),
+                      },
+                    })
+                    .then((result) => {
+                      if (result.error) throw result.error
+                      route.navigate({ type: "session", sessionID: result.data.id })
+                      return result.data.id
+                    })
+
+            await sdk.client.session.prompt({
+              sessionID,
+              parts: [{ type: "text", text: scottyOutput }],
+              noReply: true,
+            })
+            dialog.clear()
+          } catch (error) {
+            toast.show({
+              title: "Failed to show Scotty",
+              message: error instanceof Error ? error.message : "Unknown error",
+              variant: "error",
+            })
+          }
         },
         category: "System",
       },
