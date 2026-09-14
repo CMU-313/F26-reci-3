@@ -1,0 +1,7 @@
+Print exactly this ASCII dog and nothing else:
+
+ / \__
+(    @\___
+ /         O
+/   (_____/
+/_____/   U
