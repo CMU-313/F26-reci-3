@@ -1,0 +1,12 @@
+Return only the following ASCII art in a plain text code block, and nothing else.
+
+```text
+        /\_/\\
+       / o o \\
+      (   ^   )
+       \ \_/ /
+       /|###|\
+      /_|###|_\
+        /   \
+       /_/ \_\
+```
