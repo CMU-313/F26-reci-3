@@ -1,0 +1,3 @@
+Generate an ASCII art image of Scotty the Scottish Terrier, Carnegie Mellon University's mascot.
+
+Return only the ASCII art and no additional explanation.
