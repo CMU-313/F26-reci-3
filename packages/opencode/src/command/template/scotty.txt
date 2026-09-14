@@ -1,0 +1,3 @@
+Create a piece of ASCII art depicting Scotty the Scottish Terrier.
+
+Output only the ASCII art. Do not include a preamble, explanation, Markdown fences, or any other text.
