@@ -1367,6 +1367,45 @@ const layer = Layer.effect(
         yield* events.publish(Session.Event.Error, { sessionID: input.sessionID, error: error.toObject() })
         throw error
       }
+      if (input.command === Command.Default.SCOTTY) {
+        const userMessage = yield* createUserMessage({
+          ...input,
+          model: input.model ? Provider.parseModel(input.model) : undefined,
+          parts: [{ type: "text", text: `/${input.command}${input.arguments ? ` ${input.arguments}` : ""}` }],
+        })
+        const ctx = yield* InstanceState.context
+        const model = input.model ? Provider.parseModel(input.model) : userMessage.info.model
+        const assistantMessage: SessionV1.Assistant = yield* sessions.updateMessage({
+          id: MessageID.ascending(),
+          role: "assistant",
+          parentID: userMessage.info.id,
+          sessionID: input.sessionID,
+          mode: userMessage.info.agent,
+          agent: userMessage.info.agent,
+          variant: model.variant,
+          path: { cwd: ctx.directory, root: ctx.worktree },
+          cost: 0,
+          tokens: { input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
+          modelID: model.modelID,
+          providerID: model.providerID,
+          time: { created: Date.now() },
+        })
+        const part = yield* sessions.updatePart({
+          id: PartID.ascending(),
+          messageID: assistantMessage.id,
+          sessionID: input.sessionID,
+          type: "text",
+          text: String(cmd.template),
+        })
+        yield* sessions.touch(input.sessionID)
+        yield* events.publish(Command.Event.Executed, {
+          name: input.command,
+          sessionID: input.sessionID,
+          arguments: input.arguments,
+          messageID: assistantMessage.id,
+        })
+        return { info: assistantMessage, parts: [part] }
+      }
       const agentName = cmd.agent ?? input.agent
 
       const raw = input.arguments.match(argsRegex) ?? []
