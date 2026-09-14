@@ -46,6 +46,7 @@ import { DialogStatus } from "./component/dialog-status"
 import { DialogDebug } from "./component/dialog-debug"
 import { DialogThemeList } from "./component/dialog-theme-list"
 import { DialogHelp } from "./ui/dialog-help"
+import { DialogScotty } from "./ui/dialog-scotty"
 import { DialogAgent } from "./component/dialog-agent"
 import { DialogSessionList } from "./component/dialog-session-list"
 import { DialogWorkspaceList } from "./component/dialog-workspace-list"
@@ -840,6 +841,15 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
           renderer.toggleDebugOverlay()
           dialog.clear()
         },
+      },
+      {
+        name: "scotty.show",
+        title: "Show Scotty the Scottish Terrier",
+        slashName: "scotty",
+        run: () => {
+          dialog.replace(() => <DialogScotty />)
+        },
+        category: "System",
       },
       {
         name: "app.console",
