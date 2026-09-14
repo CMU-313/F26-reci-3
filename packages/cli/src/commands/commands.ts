@@ -48,5 +48,8 @@ export const Commands = Spec.make(typeof OPENCODE_CLI_NAME === "string" ? OPENCO
         register: Flag.boolean("register").pipe(Flag.withDefault(false)),
       },
     }),
+    Spec.make("scotty", {
+      description: "print ASCII art of a cute Scottish terrier",
+    }),
   ],
 })

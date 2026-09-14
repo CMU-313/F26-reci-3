@@ -22,6 +22,7 @@ const Handlers = Runtime.handlers(Commands, {
     password: () => import("./commands/handlers/service/password"),
   },
   serve: () => import("./commands/handlers/serve"),
+  scotty: () => import("./commands/handlers/scotty"),
 })
 
 Runtime.run(Commands, Handlers, { version: "local" }).pipe(
