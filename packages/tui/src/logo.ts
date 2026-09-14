@@ -9,3 +9,18 @@ export const go = {
 }
 
 export const marks = "_^~,"
+
+// Scotty the Scottish Terrier, mascot of Carnegie Mellon. Original ASCII art by
+// Joan G. Stark (jgs); her signature is kept in the last lines as attribution.
+// Rendered verbatim, so avoid the `marks` shading above - `_` and `^` are art here.
+export const scotty = [
+  "     ./\\   _",
+  "c ..'D> `'//...........'`.",
+  ":        //            :`",
+  ":       //             :",
+  "'..... //              :",
+  " ^^^^^``:              ;",
+  "        :             .'",
+  "        : :':'''''':`: `. jgs",
+  "        ''''``      ``'''",
+]
