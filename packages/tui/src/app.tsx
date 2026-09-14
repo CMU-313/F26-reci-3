@@ -139,6 +139,14 @@ const appBindingCommands = [
   "app.toggle.session_directory_filter",
 ] as const
 
+const SCOTTY_ASCII = String.raw`
+      / \__
+     (    @\___
+     /         O
+    /   (_____/
+   /_____/   U
+`
+
 export type TuiInput = {
   url: string
   args: Args
@@ -814,6 +822,15 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
           dialog.replace(() => <DialogHelp />)
         },
         category: "System",
+      },
+      {
+        name: "app.scotty",
+        title: "Show Scotty #2",
+        category: "System",
+        slashName: "scotty",
+        run: () => {
+          void DialogAlert.show(dialog, "Scotty #2", SCOTTY_ASCII)
+        },
       },
       {
         name: "docs.open",
