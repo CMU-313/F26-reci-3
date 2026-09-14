@@ -9,6 +9,7 @@ import { MCP } from "../mcp"
 import { Skill } from "../skill"
 import PROMPT_INITIALIZE from "./template/initialize.txt"
 import PROMPT_REVIEW from "./template/review.txt"
+import PROMPT_SCOTTY from "./template/scotty.txt"
 import { LegacyEvent } from "@opencode-ai/schema/legacy-event"
 
 type State = {
@@ -45,6 +46,7 @@ export function hints(template: string) {
 
 export const Default = {
   INIT: "init",
+  SCOTTY: "scotty",
   REVIEW: "review",
 } as const
 
@@ -75,6 +77,15 @@ const layer = Layer.effect(
           return PROMPT_INITIALIZE.replace("${path}", ctx.worktree)
         },
         hints: hints(PROMPT_INITIALIZE),
+      }
+      commands[Default.SCOTTY] = {
+        name: Default.SCOTTY,
+        description: "display a Scottish terrier ASCII art tribute",
+        source: "command",
+        get template() {
+          return PROMPT_SCOTTY
+        },
+        hints: hints(PROMPT_SCOTTY),
       }
       commands[Default.REVIEW] = {
         name: Default.REVIEW,
