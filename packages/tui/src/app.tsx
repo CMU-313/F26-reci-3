@@ -287,9 +287,9 @@ export const run = Effect.fn("Tui.run")(function* (input: TuiInput) {
                                     initialRoute={
                                       input.args.continue
                                         ? {
-                                            type: "session",
-                                            sessionID: "dummy",
-                                          }
+                                          type: "session",
+                                          sessionID: "dummy",
+                                        }
                                         : undefined
                                     }
                                   >
@@ -747,18 +747,18 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
       },
       ...(sync.data.console_state.switchableOrgCount > 1
         ? [
-            {
-              name: "console.org.switch",
-              title: "Switch org",
-              suggested: Boolean(sync.data.console_state.activeOrgName),
-              slashName: "org",
-              slashAliases: ["orgs", "switch-org"],
-              run: () => {
-                dialog.replace(() => <DialogConsoleOrg />)
-              },
-              category: "Provider",
+          {
+            name: "console.org.switch",
+            title: "Switch org",
+            suggested: Boolean(sync.data.console_state.activeOrgName),
+            slashName: "org",
+            slashAliases: ["orgs", "switch-org"],
+            run: () => {
+              dialog.replace(() => <DialogConsoleOrg />)
             },
-          ]
+            category: "Provider",
+          },
+        ]
         : []),
       {
         name: "opencode.status",
@@ -819,7 +819,7 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
         name: "docs.open",
         title: "Open docs",
         run: () => {
-          open("https://opencode.ai/docs").catch(() => {})
+          open("https://opencode.ai/docs").catch(() => { })
           dialog.clear()
         },
         category: "System",
@@ -951,6 +951,33 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
         run: () => {
           local.permission.toggle()
           dialog.clear()
+        },
+      },
+      {
+        name: "scotty.show",
+        title: "Show Scotty",
+        category: "System",
+        slashName: "scotty",
+        slashAliases: ["resume", "continue"],
+        run: () => {
+          dialog.replace(() => (
+            <DialogAlert
+              title="Scotty the Scottish Terrier"
+              message={String.raw`      
+           /\  /\
+          /  \/  \____
+          |  o     ____)
+          |       /###
+          /       \##       /|
+         /         \_______/ |
+        /                    |
+       |                     |
+        \___     ______     /
+            |   |      |   |
+            |___|      |___|
+              `}
+            />
+          ))
         },
       },
     ].map((command) => ({
