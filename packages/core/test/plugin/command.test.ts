@@ -42,6 +42,11 @@ describe("CommandPlugin.Plugin", () => {
         description: "review changes [commit|branch|pr], defaults to uncommitted",
         subtask: true,
       })
+      expect(yield* command.get("scotty")).toMatchObject({
+        name: "scotty",
+        description: "display a Scottish terrier",
+      })
+      expect((yield* command.get("scotty"))?.template).toContain("  /  _  _  _  \\")
     }),
   )
 })

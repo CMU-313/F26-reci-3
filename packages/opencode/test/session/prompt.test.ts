@@ -2412,6 +2412,33 @@ noLLMServer.instance(
   30_000,
 )
 
+it.instance(
+  "scotty returns its static response without an LLM request",
+  () =>
+    Effect.gen(function* () {
+      const { llm } = yield* useServerConfig(providerCfg)
+      const prompt = yield* SessionPrompt.Service
+      const sessions = yield* Session.Service
+      const session = yield* sessions.create({})
+
+      const result = yield* prompt.command({
+        sessionID: session.id,
+        agent: "build",
+        model: "test/test-model",
+        command: Command.Default.SCOTTY,
+        arguments: "",
+      })
+
+      const messages = yield* sessions.messages({ sessionID: session.id })
+      expect(messages.map((message) => message.info.role)).toEqual(["user", "assistant"])
+      expect(messages[0]?.parts[0]).toMatchObject({ type: "text", text: "/scotty" })
+      expect(result.info.role).toBe("assistant")
+      expect(result.parts[0]).toMatchObject({ type: "text", text: expect.stringContaining("(o)(o)") })
+      expect(yield* llm.calls).toBe(0)
+    }),
+  30_000,
+)
+
 noLLMServer.instance(
   "unknown command throws typed error with available names",
   () =>
