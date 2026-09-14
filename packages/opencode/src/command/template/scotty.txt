@@ -1,0 +1,6 @@
+Generate a piece of custom ASCII art depicting Scotty, a Scottish Terrier, to celebrate Tartan pride.
+
+- It does not need to precisely resemble a Scottish Terrier — a fun, recognizable dog silhouette (pointy ears, a boxy snout, short legs) is enough.
+- Keep it compact enough to render cleanly in a terminal (aim for under 20 lines and 60 columns wide).
+- Output only the ASCII art itself, with no surrounding explanation or commentary.
+- Feel free to vary the pose or style each time so repeated invocations don't look identical.
