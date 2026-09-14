@@ -568,6 +568,24 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
         },
       },
       {
+        name: "scotty",
+        title: "generate ASCII art of a scottish terrier",
+        category: "Fun",
+        suggested: true,
+        slashName: "scotty",
+        run: () => {
+          dialog.replace(() => (
+            <text>{`
+            / \\__
+            (    @\\___
+            /         O
+          /   (_____/
+          /_____/   U
+      `}</text>
+          ))
+        },
+      },
+      {
         name: "session.list",
         title: "Switch session",
         category: "Session",
