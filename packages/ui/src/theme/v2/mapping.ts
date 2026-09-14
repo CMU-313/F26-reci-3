@@ -54,6 +54,7 @@ const agentTokens: Record<string, TokenPair> = {
   },
 }
 
+//Core token dictionary mapping 
 const coreTokens: Record<string, TokenPair> = {
   "v2-background-bg-base": {
     light: ref("v2-grey-100"),
