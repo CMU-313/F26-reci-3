@@ -788,6 +788,24 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
         category: "System",
       },
       {
+        name: "scotty.show",
+        title: "Show Scotty",
+        slashName: "scotty",
+        run: () => {
+          toast.show({
+            title: "Tartan Pride!",
+            message: `      / \\__
+          (    @\\___
+          /         O
+         /   (_____/
+        /_____/   U`,
+            variant: "info",
+            duration: 5000,
+          })
+        },
+        category: "System",
+      },
+      {
         name: "theme.switch_mode",
         title: mode() === "dark" ? "Switch to light mode" : "Switch to dark mode",
         run: () => {
