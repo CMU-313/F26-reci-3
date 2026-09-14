@@ -1,0 +1,8 @@
+Reproduce the ASCII art below exactly as-is, character for character, inside a single fenced code block (no language tag), and reply with nothing else — no explanation, no commentary before or after.
+
+```
+    __
+(___()'`;
+/,    /`
+\\"--\\
+```
