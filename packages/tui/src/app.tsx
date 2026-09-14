@@ -89,6 +89,15 @@ import { cliErrorMessage, errorFormat } from "./util/error"
 
 registerOpencodeSpinner()
 
+const SCOTTY_ART = `
+
+  /^ ^\\
+ / 0 0 \\
+ V\\ Y /V
+  / - \\
+ /    |
+V__) ||`
+
 const appGlobalBindingCommands = [
   "session.list",
   "session.new",
@@ -812,6 +821,15 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
         slashName: "help",
         run: () => {
           dialog.replace(() => <DialogHelp />)
+        },
+        category: "System",
+      },
+      {
+        name: "app.scotty",
+        title: "Scotty",
+        slashName: "scotty",
+        run: () => {
+          dialog.replace(() => <DialogAlert title="Scotty" message={SCOTTY_ART} />)
         },
         category: "System",
       },
