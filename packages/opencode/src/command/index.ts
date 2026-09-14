@@ -11,6 +11,8 @@ import PROMPT_INITIALIZE from "./template/initialize.txt"
 import PROMPT_REVIEW from "./template/review.txt"
 import { LegacyEvent } from "@opencode-ai/schema/legacy-event"
 
+import PROMPT_SCOTTY from "./template/scotty.txt"
+
 type State = {
   commands: Record<string, Info>
 }
@@ -85,6 +87,15 @@ const layer = Layer.effect(
         },
         subtask: true,
         hints: hints(PROMPT_REVIEW),
+      }
+      commands["scotty"] = {
+        name: "scotty",
+        description: "display your scotty pride",
+        source: "command",
+        get template() {
+          return PROMPT_SCOTTY
+        },
+        hints: [],
       }
 
       for (const [name, command] of Object.entries(cfg.command ?? {})) {
