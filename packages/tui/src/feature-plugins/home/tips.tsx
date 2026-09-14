@@ -1,7 +1,7 @@
 import type { TuiPlugin, TuiPluginApi } from "@opencode-ai/plugin/tui"
 import type { BuiltinTuiPlugin } from "../builtins"
 import { createMemo, Show } from "solid-js"
-import { Tips } from "./tips-view"
+import { DialogScotty, Tips } from "./tips-view"
 import { useBindings } from "../../keymap"
 
 const id = "internal:home-tips"
@@ -33,6 +33,22 @@ function View(props: { api: TuiPluginApi; hidden: boolean; show: boolean; connec
 }
 
 const tui: TuiPlugin = async (api) => {
+  api.keymap.registerLayer({
+    commands: [
+      {
+        name: "tips.scotty",
+        title: "Show Scotty",
+        desc: "print ASCII art of a cute Scottish terrier",
+        slashName: "scotty",
+        category: "System",
+        namespace: "palette",
+        run() {
+          api.ui.dialog.replace(() => <DialogScotty />)
+        },
+      },
+    ],
+  })
+
   api.slots.register({
     order: 100,
     slots: {

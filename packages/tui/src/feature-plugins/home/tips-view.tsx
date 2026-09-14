@@ -1,7 +1,9 @@
 import type { TuiPluginApi } from "@opencode-ai/plugin/tui"
+import { TextAttributes } from "@opentui/core"
 import { createMemo, For, type Accessor } from "solid-js"
 import { DEFAULT_THEMES, useTheme } from "../../context/theme"
-import { useCommandShortcut } from "../../keymap"
+import { useBindings, useCommandShortcut } from "../../keymap"
+import { useDialog } from "../../ui/dialog"
 
 const themeCount = Object.keys(DEFAULT_THEMES).length
 
@@ -92,6 +94,48 @@ function configShortcut(api: TuiPluginApi, command: string): TipShortcut {
       .map((binding) => api.keys.formatSequence(Array.from(api.keymap.parseKeySequence(binding.key))))
       .filter(Boolean)
       .join(", ")
+}
+
+const SCOTTY = [
+  "              /\\   /\\",
+  "             /  \\_/  \\",
+  "            |  o   o  |",
+  "            |    ^    |",
+  "             \\ ===== /",
+  "          .--'|     |'--.",
+  "         /    |     |    \\",
+  "        |     |_____|     |",
+  "         \\    ||   ||    /",
+  "          '--._||   ||_.'",
+  "              (__) (__)",
+].join("\n")
+
+export function DialogScotty() {
+  const dialog = useDialog()
+  const { theme } = useTheme()
+
+  useBindings(() => ({
+    bindings: [
+      { key: "return", desc: "Close Scotty", group: "Dialog", cmd: () => dialog.clear() },
+      { key: "escape", desc: "Close Scotty", group: "Dialog", cmd: () => dialog.clear() },
+    ],
+  }))
+
+  return (
+    <box paddingLeft={2} paddingRight={2} gap={1}>
+      <box flexDirection="row" justifyContent="space-between">
+        <text attributes={TextAttributes.BOLD} fg={theme.text}>
+          Scotty
+        </text>
+        <text fg={theme.textMuted} onMouseUp={() => dialog.clear()}>
+          esc/enter
+        </text>
+      </box>
+      <text fg={theme.text} wrapMode="none">
+        {SCOTTY}
+      </text>
+    </box>
+  )
 }
 
 export function Tips(props: { api: TuiPluginApi; connected?: boolean }) {
@@ -280,6 +324,7 @@ const TIPS: Tip[] = [
   "Use {highlight}/review{/highlight} to review uncommitted changes, branches, or PRs",
   (shortcuts) => `Use ${commandText("/help", shortcuts.helpShow())} to show the help dialog`,
   "Use {highlight}/rename{/highlight} to rename the current session",
+  "Run {highlight}/scotty{/highlight} to print a Scottish terrier",
 ]
 
 const INPUT_UNDO_TIP: Tip = (shortcuts) => press(shortcuts.inputUndo(), "to undo changes in your prompt")
